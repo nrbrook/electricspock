@@ -17,11 +17,12 @@
 
 package hkhc.electricspock
 
+import android.os.Build
 import org.robolectric.annotation.Config;
 /**
  * Created by herman on 29/9/2017.
  */
-@Config(manifest=Config.NONE)
+@Config(manifest=Config.NONE, sdk = Build.VERSION_CODES.P)
 class RobolectricVersionCheckerSpec extends ElectricSpecification {
 
     def "Unknown Robolectric version"() {
@@ -79,7 +80,7 @@ class RobolectricVersionCheckerSpec extends ElectricSpecification {
             checker.checkRobolectricVersion(ver)
         then:
             def ex = thrown(RuntimeException)
-            ex.message == "This version of ElectricSpock supports Robolectric 3.3.x to 3.8.x only. Version ${ver} is detected." as String
+            ex.message == "This version of ElectricSpock supports Robolectric 4.0.x to 4.5.x only. Version ${ver} is detected. You can downgrade to a previous version of Electricspock to support older versions of Robolectric" as String
 
         where:
             ver || _

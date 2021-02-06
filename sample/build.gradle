@@ -14,17 +14,17 @@
  * limitations under the License.
  *
  */
-
-apply plugin: 'com.android.application'
-apply plugin: 'groovyx.android'
+plugins {
+    id 'com.android.application'
+    id 'groovyx.android'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 30
     defaultConfig {
         applicationId "hkhc.electricspock.sample"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 20
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -53,8 +53,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     testOptions {
@@ -75,24 +75,28 @@ android {
 
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-ads:18.2.0'
+    implementation 'com.google.android.gms:play-services-ads:19.7.0'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
 //        exclude group: 'com.android.support', module: 'support-annotations'
     })
 //    implementation 'com.android.support:appcompat-v7:28.+'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.junit.platform:junit-platform-runner:1.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
+
     testImplementation project(':electricspock-electricspock')
-    testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation 'org.robolectric:robolectric:4.5.1'
 //    testImplementation 'org.robolectric:shadows-support-v4:3.4-rc2'
-    testImplementation 'org.codehaus.groovy:groovy-all:2.5.0'
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.7'
+    testImplementation 'org.spockframework:spock-core:2.0-M4-groovy-3.0'
 
     testImplementation( 'com.athaydes:spock-reports:1.3.2' ) {
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
     testImplementation 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
     testImplementation 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
-    implementation 'androidx.appcompat:appcompat:1.1.0'// needed by spock-reports
+    implementation 'androidx.appcompat:appcompat:1.2.0'// needed by spock-reports
 }
 

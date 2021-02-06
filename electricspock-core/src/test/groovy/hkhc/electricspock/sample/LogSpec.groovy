@@ -17,17 +17,19 @@
 
 package hkhc.electricspock.sample
 
+import android.os.Build
+import android.util.Log
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.annotation.Config;
 /**
  * Created by herman on 28/12/2016.
  */
-@Config(manifest=Config.NONE)
+@Config(manifest=Config.NONE, sdk = Build.VERSION_CODES.P)
 class LogSpec extends ElectricSpecification {
 
     def "Run Log without error"() {
         when:
-            android.util.Log.d("TAG", "Hello");
+            Log.d("TAG", "Hello");
         then:
             notThrown(Throwable)
     }

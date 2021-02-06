@@ -70,7 +70,7 @@ class ContainedRobolectricTestRunnerTest {
     }
 
     @Test
-    void "SdkEnvironment.getBootstrap shall return a class object with different class loader"() {
+    void "SdkEnvironment#getBootstrap shall return a class object with different class loader"() {
 
         // given
         AndroidSandbox sdkEnv = runner.getContainedSdkEnvironment()
