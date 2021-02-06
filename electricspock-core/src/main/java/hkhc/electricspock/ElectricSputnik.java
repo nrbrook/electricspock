@@ -18,6 +18,7 @@
 package hkhc.electricspock;
 
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
@@ -33,9 +34,13 @@ import org.spockframework.runtime.model.SpecInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import hkhc.electricspock.internal.ContainedRobolectricTestRunner;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
@@ -86,6 +91,44 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
+    private static final String ANNOTATION_METHOD = "annotationData";
+    private static final String ANNOTATIONS = "annotations";
+
+
+    @SuppressWarnings("unchecked")
+    public static void alterAnnotationValueJDK8(Class<?> targetClass, Class<? extends Annotation> targetAnnotation, Annotation targetValue) {
+        try {
+            Method method = Class.class.getDeclaredMethod(ANNOTATION_METHOD);
+            method.setAccessible(true);
+
+            Object annotationData = method.invoke(targetClass);
+
+            if (annotationData != null) {
+                Field annotations = annotationData.getClass().getDeclaredField(ANNOTATIONS);
+                annotations.setAccessible(true);
+
+                Map<Class<? extends Annotation>, Annotation> map = (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
+                if (map != null) {
+                    map.put(targetAnnotation, targetValue);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    static final RunWith JUnitPlatformRunWithAnnotation = new RunWith() {
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return RunWith.class;
+        }
+
+        @Override
+        public Class<? extends Runner> value() {
+            return JUnitPlatform.class;
+        }
+    };
+
     /**
      * Sputnik is the test runner for Spock specification. This method Load the spec class and
      * Sputnik class with Robolectric sandbox, so that Robolectric can intercept the Android API
@@ -96,9 +139,12 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     private Runner createSputnik(Class<? extends Specification> specClass) {
 
         Class<Object> bootstrappedTestClass = sdkEnvironment.bootstrappedClass(specClass);
+        
+        // Here we do some black magic to make JUnit see the runner as JUnitPlatform which prevents recursion in DefensiveAllDefaultPossibilitiesBuilder$DefensiveAnnotatedBuilder  
+        RunWith current = bootstrappedTestClass.getAnnotation(RunWith.class);
+        alterAnnotationValueJDK8(bootstrappedTestClass, RunWith.class, JUnitPlatformRunWithAnnotation);
 
         try {
-
             return (Runner) sdkEnvironment
                     .bootstrappedClass(JUnitPlatform.class)
                     .getConstructor(Class.class)
@@ -106,8 +152,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            alterAnnotationValueJDK8(bootstrappedTestClass, RunWith.class, current);
         }
-
     }
 
     /**
